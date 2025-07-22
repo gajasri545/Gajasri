@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Colorizer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    img {
+      max-width: 500px;
+      margin: 20px auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>🖼 Black & White Image Colorizer</h1>
+  <input type="file" id="fileInput" accept="image/*" />
+  <br />
+  <button onclick="uploadImage()">🎨 Colorize</button>
+
+  <h2>Original Image</h2>
+  <img id="originalImage" src="">
+
+  <h2>Colorized Image</h2>
+  <img id="colorizedImage" src="">
+
+  <script>
+    function uploadImage() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      if (!file) return alert("Please choose an image!");
+
+      document.getElementById("originalImage").src = URL.createObjectURL(file);
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      fetch("/colorize", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Colorization failed");
+        return response.blob();
+      })
+      .then(blob => {
+        const imgUrl = URL.createObjectURL(blob);
+        document.getElementById("colorizedImage").src = imgUrl;
+      })
+      .catch(err => {
+        alert("Error: " + err.message);
+      });
+    }
+  </script>
+</body>
+</html>
